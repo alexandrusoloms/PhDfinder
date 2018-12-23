@@ -36,11 +36,7 @@ def send_info(html_code):
 
         description = result.find('div', attrs={'class': 'descFrag'}).text.strip()
 
-<<<<<<< HEAD
         body = """Application Deadline: {}\n\nFunding Type: {}\n\nSupervisor(s): {}\n\nDescription:{}\n\n\n\nThe
-=======
-        body = """Application Deadline: {}\n\nFunding Type: {}\n\nSupervisor(s): {}\n\nDescription:{}\n\n\n\nThe 
->>>>>>> 07955075a65b8ec93b3450bbfc80d4c093544fba
         course link is: {}. The institution is {}.""".format(
             application_time,
             funding_type,
@@ -75,12 +71,9 @@ find_phd_url = [
 response = ConcurrentRequester(list_of_urls=find_phd_url).run()
 
 for (url, html) in response.items():
-<<<<<<< HEAD
     try:
         send_info(html_code=html)
     except AttributeError:
         # sometimes universities do not have an entry for the `words_searched`
+        # this will be successfully ignored.
         continue
-=======
-    send_info(html_code=html)
->>>>>>> 07955075a65b8ec93b3450bbfc80d4c093544fba
