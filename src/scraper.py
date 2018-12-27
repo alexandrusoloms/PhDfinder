@@ -1,10 +1,31 @@
 import sys
 import os
 import re
+import json
 from bs4 import BeautifulSoup
 
 from crawly.scrapers import ConcurrentRequester
 from ams_pymail.send_mail import send_mail
+
+
+def check_if_entry_exists(potential_entry):
+    for f in os.listdir(output_path):
+        if 'saved_entries' in f:
+            with open(output_path + 'saved_entries.json', 'r') as handle:
+                saved_entries = json.load(handle)
+                if potential_entry in saved_entries:
+                    return True
+                else:
+                    saved_entries.append(potential_entry)
+                    # save it
+                    with open(output_path + 'saved_entries.json', 'w') as handle:
+                        json.dump(saved_entries, handle)
+                    return False
+
+    # save the file for the first time (making sure it is a list)
+    with open(output_path + 'saved_entries.json', 'w') as handle:
+        potential_entry = [potential_entry]
+        json.dump(potential_entry, handle)
 
 
 def send_info(html_code):
@@ -48,9 +69,12 @@ def send_info(html_code):
         institution = institution.encode('ascii', 'ignore').decode('utf8')
         course_title = course_title.encode('ascii', 'ignore').decode('utf8')
 
-        send_mail(subject='[{}-{}]: {}'.format(word_searched, institution, course_title), body=body, to_address=my_email)
+        potential_entry = '{}-{}'.format(course_title, application_time)
+        if not check_if_entry_exists(potential_entry=potential_entry):
+            send_mail(subject='[{}-{}]: {}'.format(word_searched, institution, course_title), body=body, to_address=my_email)
 
 
+output_path = os.path.join(os.path.dirname('__file__'), '..', ) + '/output/'
 my_email = os.environ['MyEmail']
 word_searched = sys.argv[1:]
 
